@@ -9,7 +9,9 @@
 
 _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, featuring conversational clarification and intelligent document retrieval._
 
-📖 **Published Research**: [Springer - Advances in Intelligent Systems and Computing](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)
+� **[Try Live Demo](https://advanced-rag-system-with-agentic-workflow.onrender.com/)** | 📖 **[Published Research](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)**
+
+> ⏱️ **Note**: The live demo runs on Render's free tier. If the app hasn't been used recently, it may take 2-3 minutes to spin up on first visit. Please be patient!
 
 > DISCLAIMER: The paper linked above presents an older version of this project. The current implementation includes noticeable changes in architecture, features, and document coverage. Which might not be reflected in the publication and have different performance characteristics.
 
@@ -19,19 +21,52 @@ _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, fea
 
 ## 📋 Table of Contents
 
+- [🚀 Try Live Demo](#-try-live-demo)
 - [🎯 Overview](#-overview)
 - [✨ Features](#-features)
 - [🏗️ Architecture](#️-architecture)
 - [📁 Project Structure](#-project-structure)
 - [🛠️ Installation](#️-installation)
 - [🚀 Quick Start](#-quick-start)
-- [�📚 Legal Database](#-legal-database)
+- [🐳 Docker Deployment](#-docker-deployment)
+- [📚 Legal Database](#-legal-database)
 - [🤖 How It Works](#-how-it-works)
 - [🔧 Configuration](#-configuration)
 - [📊 Performance & Limitations](#-performance--limitations)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 - [🙏 Acknowledgments](#-acknowledgments)
+
+---
+
+## 🚀 Try Live Demo
+
+**Experience the chatbot live**: [https://advanced-rag-system-with-agentic-workflow.onrender.com/](https://advanced-rag-system-with-agentic-workflow.onrender.com/)
+
+### What to Expect
+
+✅ **Full Bengali OCR Support** - Process scanned Bengali legal documents  
+✅ **22+ Legal Documents** - Comprehensive Bangladeshi law coverage  
+✅ **Intelligent Clarification** - AI asks follow-up questions for better accuracy  
+✅ **Web Search Fallback** - Finds answers beyond the local database  
+✅ **Source Citations** - All responses include references to source documents
+
+### ⏱️ First-Time Access
+
+The live demo runs on **Render's free tier**, which means:
+
+- If the app hasn't been used recently, it will be in a "sleep" state
+- **First visit may take 2-3 minutes** to spin up the server
+- Subsequent visits while the app is awake are instant
+- Please be patient during the initial load! ☕
+
+### 💡 Try These Example Queries
+
+Once the app loads, try asking:
+
+- _"What is the definition of a company? How many types are there?"_
+- _"How to file a domestic violence case in Dhaka Family Court?"_
+- _"Section 138 cheque dishonour penalties under Negotiable Instruments Act"_
 
 ---
 
