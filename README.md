@@ -8,6 +8,8 @@
 
 _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, featuring conversational clarification and intelligent document retrieval._
 
+📖 **Published Research**: [Springer - Advances in Intelligent Systems and Computing](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)
+
 ---
 
 ## 📋 Table of Contents
@@ -182,13 +184,19 @@ cse499-final-version/
 4. **Environment Configuration**
 
    ```bash
-   # Create .env file
-   touch .env
+   # Copy the example environment file
+   cp .env.example .env
 
-   # Add your API keys
-   echo "OPENAI_API_KEY=your_openai_key_here" >> .env
-   echo "TAVILY_API_KEY=your_tavily_key_here" >> .env
+   # Edit .env and add your actual API keys
+   # NEVER commit the .env file to version control
    ```
+
+   **Required API Keys:**
+
+   - **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Tavily API Key**: Get from [Tavily](https://tavily.com/)
+
+   **Security Note:** API keys are loaded from environment variables only. Never enter keys in the UI or commit them to version control.
 
 5. **Add Legal Documents**
    ```bash
@@ -206,10 +214,12 @@ cse499-final-version/
    streamlit run app.py
    ```
 
+   **Important:** Ensure your `.env` file contains valid API keys before launching.
+
 2. **Access the Interface**
 
    - Open your browser to `http://localhost:8501`
-   - Enter your API keys in the sidebar
+   - The app will validate API keys from environment variables at startup
    - Wait for initialization (first run may take time for document processing)
 
 3. **Start Chatting**
@@ -410,6 +420,16 @@ Special thanks to the Government of Bangladesh and legal document repositories f
 ### Academic Context
 
 This project was developed as part of CSE499 (Computer Science Project) to demonstrate practical applications of AI in legal technology and information retrieval.
+
+### Published Research
+
+The methodology and findings from this project have been published in:
+
+📖 **[Advances in Intelligent Systems and Computing - Springer](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)**
+
+_Citation_: Advanced RAG System with Agentic Workflow for Bangladeshi Legal Document Retrieval
+
+If you use this work in your research, please consider citing our publication.
 
 ---
 

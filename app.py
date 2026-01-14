@@ -861,29 +861,79 @@ with st.sidebar:
 
 st.header("🏛️ Conversational Legal RAG Chatbot for Bangladesh")
 
-# --- API Key Input & Resource Initialization ---
-with st.sidebar:
-    st.header("Configuration")
-    openai_api_key_input = st.text_input("OpenAI API Key", type="password", value=os.getenv("OPENAI_API_KEY", ""))
-    tavily_api_key_input = st.text_input("Tavily API Key", type="password", value=os.getenv("TAVILY_API_KEY", ""))
+# --- API Key Validation (Environment Variables Only) ---
+openai_api_key = os.getenv("OPENAI_API_KEY", "").strip()
+tavily_api_key = os.getenv("TAVILY_API_KEY", "").strip()
 
-    keys_provided = openai_api_key_input and tavily_api_key_input
+# Validate API keys are present
+if not openai_api_key or not tavily_api_key:
+    st.error("🚨 **API Keys Missing**")
+    st.markdown("""
+    This application requires API keys to be set as environment variables.
+    
+    **Setup Instructions:**
+    
+    1. Create a `.env` file in the project root directory
+    2. Add the following lines:
+       ```
+       OPENAI_API_KEY=your_openai_key_here
+       TAVILY_API_KEY=your_tavily_key_here
+       ```
+    3. Restart the application
+    
+    **Missing Keys:**
+    - OpenAI API Key: {'❌ Not Set' if not openai_api_key else '✅ Set'}
+    - Tavily API Key: {'❌ Not Set' if not tavily_api_key else '✅ Set'}
+    
+    **Security Note:** API keys should NEVER be entered in the UI or committed to version control.
+    """)
+    st.stop()
 
-    if not keys_provided:
-        st.warning("Please enter your OpenAI and Tavily API keys in the sidebar to proceed.")
-        st.stop()
+# Validate API key formats
+if not openai_api_key.startswith("sk-"):
+    st.error("🚨 **Invalid OpenAI API Key Format**")
+    st.markdown("""
+    OpenAI API keys should start with `sk-`. 
+    
+    Please check your `.env` file and ensure you've copied the correct key from [OpenAI Platform](https://platform.openai.com/api-keys).
+    """)
+    st.stop()
 
+if not tavily_api_key.startswith("tvly-"):
+    st.error("🚨 **Invalid Tavily API Key Format**")
+    st.markdown("""
+    Tavily API keys should start with `tvly-`. 
+    
+    Please check your `.env` file and ensure you've copied the correct key from [Tavily](https://tavily.com/).
+    """)
+    st.stop()
+
+# --- Resource Initialization ---
+with st.sidebar: 
+    # Academic Publication
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📄 Published Research")
+    st.sidebar.markdown("""
+    This work has been published in Springer:
+    
+    📖 [**Read the Academic Paper**](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)
+    
+    *Advances in Intelligent Systems and Computing*
+    """)
     st.markdown("---")
+    st.header("Configuration")
+    st.success("✅ API Keys Loaded from Environment")
+
     st.subheader("Status")
     status_placeholder = st.empty()
     status_placeholder.info("Initializing resources...")
 
     # Initialize base models first
-    embed_model = get_embedding_model(openai_api_key_input)
+    embed_model = get_embedding_model(openai_api_key)
     vector_db = load_or_create_vector_db(embed_model)
 
     # Initialize clarification agent
-    clarification_agent = get_clarification_agent(openai_api_key_input)
+    clarification_agent = get_clarification_agent(openai_api_key)
 
     # Initialize retriever and RAG agent app
     similarity_retriever = None
@@ -904,7 +954,7 @@ with st.sidebar:
                 search_kwargs={"k": MAX_DOCS_PER_QUERY, "score_threshold": MINIMUN_RETRIVAL_SCORE}
             )
             st.success("Retriever is ready.")
-            rag_app = get_agentic_rag_app(similarity_retriever, openai_api_key_input, tavily_api_key_input)
+            rag_app = get_agentic_rag_app(similarity_retriever, openai_api_key, tavily_api_key)
             if not rag_app:
                  st.error("RAG Agent application failed to compile.")
                  resources_ready = False
@@ -928,10 +978,10 @@ with st.sidebar:
     st.markdown("Powered by LangChain, LangGraph, OpenAI, ChromaDB, Tavily & Streamlit")
     if os.path.exists(CLARIFICATION_GRAPH_IMAGE_PATH):
         st.sidebar.subheader("Clarification Agent Workflow")
-        st.sidebar.image(CLARIFICATION_GRAPH_IMAGE_PATH, width=True)
+        st.sidebar.image(CLARIFICATION_GRAPH_IMAGE_PATH, width='content')
     if os.path.exists(RAG_GRAPH_IMAGE_PATH):
         st.sidebar.subheader("RAG Agent Workflow")
-        st.sidebar.image(RAG_GRAPH_IMAGE_PATH, width=True)
+        st.sidebar.image(RAG_GRAPH_IMAGE_PATH, width='content')
 
 
 # --- Chat Interface ---
