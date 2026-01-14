@@ -15,6 +15,7 @@ langchain-openai
 langchain-community
 langchain-experimental
 langchain-chroma
+langchain-text-splitters # For modern text splitting
 langgraph
 
 # Dependencies for LangChain Integrations

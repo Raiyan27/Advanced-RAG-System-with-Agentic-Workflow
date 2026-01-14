@@ -2,7 +2,7 @@
 import streamlit as st
 import os
 import fitz  # PyMuPDF
-from typing import List, Optional, TypedDict as TypingTypedDict
+from typing import List, Optional
 from typing_extensions import TypedDict 
 from operator import itemgetter
 from dotenv import load_dotenv
@@ -19,12 +19,13 @@ load_dotenv()
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.document_loaders import PyPDFDirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, MessagesPlaceholder 
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda, RunnableConfig
 from langchain_core.output_parsers import StrOutputParser
-from langchain.schema import Document, HumanMessage, AIMessage 
+from langchain_core.documents import Document
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_community.tools.tavily_search import TavilySearchResults
 
 
@@ -927,10 +928,10 @@ with st.sidebar:
     st.markdown("Powered by LangChain, LangGraph, OpenAI, ChromaDB, Tavily & Streamlit")
     if os.path.exists(CLARIFICATION_GRAPH_IMAGE_PATH):
         st.sidebar.subheader("Clarification Agent Workflow")
-        st.sidebar.image(CLARIFICATION_GRAPH_IMAGE_PATH, use_column_width=True)
+        st.sidebar.image(CLARIFICATION_GRAPH_IMAGE_PATH, width=True)
     if os.path.exists(RAG_GRAPH_IMAGE_PATH):
         st.sidebar.subheader("RAG Agent Workflow")
-        st.sidebar.image(RAG_GRAPH_IMAGE_PATH, use_column_width=True)
+        st.sidebar.image(RAG_GRAPH_IMAGE_PATH, width=True)
 
 
 # --- Chat Interface ---

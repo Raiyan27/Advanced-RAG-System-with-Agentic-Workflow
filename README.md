@@ -1,6 +1,6 @@
 # 🏛️ Conversational Legal RAG Chatbot for Bangladesh
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)
 ![LangChain](https://img.shields.io/badge/LangChain-0.1+-green.svg)
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-orange.svg)
@@ -163,7 +163,7 @@ cse499-final-version/
 
    ```bash
    git clone https://github.com/your-username/legal-rag-bangladesh.git
-   cd legal-rag-bangladesh
+   cd Advanced-RAG-System-with-Agentic-Workflow
    ```
 
 2. **Create Virtual Environment**
