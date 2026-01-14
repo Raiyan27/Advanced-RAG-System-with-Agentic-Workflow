@@ -10,6 +10,10 @@ _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, fea
 
 📖 **Published Research**: [Springer - Advances in Intelligent Systems and Computing](https://link.springer.com/chapter/10.1007/978-3-032-11355-9_26)
 
+> DISCLAIMER: The paper linked above presents an older version of this project. The current implementation includes noticeable changes in architecture, features, and document coverage. Which might not be reflected in the publication and have different performance characteristics.
+
+> DISCLAIMER: This chatbot is for educational purposes only and does not provide legal advice. Always consult a qualified legal professional for actual legal matters.
+
 ---
 
 ## 📋 Table of Contents
@@ -61,6 +65,13 @@ The chatbot serves as an educational tool and preliminary research assistant for
 - **Web Search Integration**: Tavily-powered web search for comprehensive coverage
 - **Multi-Source Synthesis**: Combines local documents with web results
 
+### � Bengali Language Support
+
+- **OCR Processing**: Tesseract-based OCR for scanned Bengali documents
+- **Dual Language Support**: Handles both Bengali (বাংলা) and English text
+- **Smart Extraction**: Automatic fallback from direct extraction to OCR when needed
+- **Mixed Documents**: Processes documents containing both Bengali and English text
+
 ### 🎨 User Experience
 
 - **Streamlit Web Interface**: Modern, responsive chat interface
@@ -76,6 +87,7 @@ The chatbot serves as an educational tool and preliminary research assistant for
 - **Persistent Storage**: ChromaDB vector database with automatic persistence
 - **API Integration**: OpenAI GPT-4o-mini and Tavily Search API
 - **Graph Visualization**: Automatic generation of agent workflow diagrams
+- **Extraction Tracking**: Metadata tracks which extraction method was used per document
 
 ---
 
@@ -158,6 +170,7 @@ cse499-final-version/
 - **Python 3.8+**
 - **OpenAI API Key** (for embeddings and LLM)
 - **Tavily API Key** (for web search)
+- **Tesseract OCR** (optional, for Bengali document support)
 
 ### Step-by-Step Setup
 
@@ -181,7 +194,28 @@ cse499-final-version/
    pip install -r requirements.txt
    ```
 
-4. **Environment Configuration**
+4. **Install Tesseract OCR (Optional - for Bengali Documents)**
+
+   **Windows:**
+
+   - Download installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
+   - During installation, select "Additional language data" and check "Bengali"
+   - Add Tesseract to PATH (e.g., `C:\Program Files\Tesseract-OCR`)
+
+   **Ubuntu/Debian:**
+
+   ```bash
+   sudo apt update
+   sudo apt install tesseract-ocr tesseract-ocr-ben poppler-utils
+   ```
+
+   **macOS:**
+
+   ```bash
+   brew install tesseract tesseract-lang poppler
+   ```
+
+5. **Environment Configuration**
 
    ```bash
    # Copy the example environment file
@@ -198,7 +232,7 @@ cse499-final-version/
 
    **Security Note:** API keys are loaded from environment variables only. Never enter keys in the UI or commit them to version control.
 
-5. **Add Legal Documents**
+6. **Add Legal Documents**
    ```bash
    # Place PDF files in the data/ directory
    # The app will automatically process them on first run
@@ -345,20 +379,21 @@ MAX_QUERY_CLARIFICATION_TURNS = 5    # Max clarification rounds
 ✅ **Source Transparency**: Clear citations to PDF files and web sources  
 ✅ **Conversational**: Natural clarification process  
 ✅ **Comprehensive Coverage**: 22+ legal documents  
-✅ **Fallback Mechanism**: Web search when local docs insufficient
+✅ **Fallback Mechanism**: Web search when local docs insufficient  
+✅ **Bengali OCR Support**: Process scanned Bengali legal documents
 
 ### Current Limitations
 
 ⚠️ **Knowledge Cutoff**: Legal documents reflect laws as of 2023 and earlier  
 ⚠️ **No Personal Advice**: Educational tool, not legal counsel  
-⚠️ **Language Scope**: Primarily English legal documents  
+⚠️ **OCR Quality**: Bengali OCR accuracy depends on document scan quality  
 ⚠️ **Web Dependency**: Requires Tavily API for comprehensive answers  
 ⚠️ **Resource Intensive**: Initial setup requires significant compute for embeddings
 
 ### Future Improvements
 
 🔮 **Real-time Legal Updates**: Integration with official legal databases  
-🔮 **Multi-language Support**: Bengali language processing  
+🔮 **Enhanced Bengali NLP**: Better Bengali text understanding and generation  
 🔮 **Case Law Integration**: Court precedent analysis  
 🔮 **Legal Expert Validation**: Human-reviewed answer accuracy
 

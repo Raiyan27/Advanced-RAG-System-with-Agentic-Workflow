@@ -5,6 +5,10 @@ streamlit
 PyMuPDF # For fitz (direct PDF manipulation)
 pypdf   # Often used by LangChain PDF loaders
 
+# OCR Support for Bengali and Scanned Documents
+pytesseract     # Python wrapper for Tesseract OCR
+pdf2image       # Convert PDF pages to images for OCR
+
 # Environment Variables
 python-dotenv
 

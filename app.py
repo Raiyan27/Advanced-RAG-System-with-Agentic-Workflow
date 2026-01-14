@@ -13,6 +13,14 @@ import traceback
 import sys
 import math 
 
+# OCR imports for Bengali language support
+try:
+    import pytesseract
+    from pdf2image import convert_from_path
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+
 load_dotenv()
 
 # LangChain Imports
@@ -45,24 +53,146 @@ MAX_DOCS_PER_QUERY = 5
 MINIMUN_RETRIVAL_SCORE = 0.1
 MAX_QUERY_CLARIFICATION_TURNS = 5
 
-# --- PDF Processing Functions ---
-# ... (Keep the existing extract_text_from_pdf and process_pdfs_in_directory functions) ...
-def extract_text_from_pdf(pdf_path):
-    """Extracts text from a single PDF file."""
+# OCR Configuration
+OCR_LANGUAGES = "ben+eng"  # Bengali + English for mixed documents
+OCR_DPI = 300  # DPI for PDF to image conversion
+MIN_TEXT_LENGTH_FOR_VALID_EXTRACTION = 100  # Minimum characters to consider text extraction successful
+
+# --- OCR Functions for Bengali Language Support ---
+def check_tesseract_installation():
+    """Check if Tesseract OCR is installed and Bengali language pack is available."""
+    if not OCR_AVAILABLE:
+        return False, "pytesseract or pdf2image not installed"
+    
+    try:
+        # Check if tesseract is accessible
+        tesseract_version = pytesseract.get_tesseract_version()
+        
+        # Check available languages
+        available_langs = pytesseract.get_languages()
+        
+        has_bengali = 'ben' in available_langs
+        has_english = 'eng' in available_langs
+        
+        if not has_bengali:
+            return False, f"Bengali language pack (ben) not found. Available: {available_langs}. Install with: sudo apt install tesseract-ocr-ben (Linux) or download from GitHub (Windows)"
+        
+        return True, f"Tesseract v{tesseract_version} ready with Bengali support"
+    except Exception as e:
+        return False, f"Tesseract not found: {e}. Install from: https://github.com/tesseract-ocr/tesseract"
+
+
+def extract_text_with_ocr(pdf_path, languages=OCR_LANGUAGES):
+    """
+    Extract text from PDF using OCR (for scanned documents or Bengali text).
+    Supports Bengali (ben) and English (eng) languages.
+    """
+    if not OCR_AVAILABLE:
+        return None, "OCR libraries not available"
+    
+    try:
+        # Convert PDF to images
+        images = convert_from_path(pdf_path, dpi=OCR_DPI)
+        
+        all_text = []
+        for i, image in enumerate(images):
+            # Perform OCR with Bengali + English
+            page_text = pytesseract.image_to_string(image, lang=languages)
+            if page_text.strip():
+                all_text.append(page_text)
+        
+        full_text = "\n".join(all_text)
+        return full_text, None
+    except Exception as e:
+        return None, str(e)
+
+
+def is_text_extraction_successful(text):
+    """
+    Check if text extraction was successful.
+    Returns False if text is mostly garbled or too short.
+    """
+    if not text or len(text.strip()) < MIN_TEXT_LENGTH_FOR_VALID_EXTRACTION:
+        return False
+    
+    # Check for common signs of failed extraction (too many special chars, no spaces)
+    clean_text = text.strip()
+    
+    # If more than 50% of characters are non-alphanumeric (excluding Bengali Unicode range), likely garbled
+    # Bengali Unicode range: \u0980-\u09FF
+    import re
+    valid_chars = re.findall(r'[\w\s\u0980-\u09FF]', clean_text)
+    
+    if len(valid_chars) < len(clean_text) * 0.3:
+        return False
+    
+    return True
+
+
+# --- PDF Processing Functions (Enhanced with Bengali OCR Support) ---
+def extract_text_from_pdf(pdf_path, use_ocr_fallback=True):
+    """
+    Extracts text from a single PDF file.
+    
+    Strategy:
+    1. Try direct text extraction (fast, works for text-based PDFs)
+    2. If extraction fails or returns garbled text, fall back to OCR
+    3. OCR supports Bengali (ben) and English (eng) languages
+    
+    Args:
+        pdf_path: Path to the PDF file
+        use_ocr_fallback: Whether to use OCR if direct extraction fails
+    
+    Returns:
+        Tuple of (extracted_text, extraction_method) or (None, None) on failure
+    """
+    extraction_method = "direct"
+    
+    # Step 1: Try direct text extraction (PyMuPDF)
     try:
         doc = fitz.open(pdf_path)
         text = ""
         for page_num in range(doc.page_count):
             page = doc.load_page(page_num)
             text += page.get_text()
-        return text
+        doc.close()
+        
+        # Check if extraction was successful
+        if is_text_extraction_successful(text):
+            return text, "direct"
+        
     except Exception as e:
-        st.error(f"Error processing {pdf_path}: {e}")
-        return None
+        print(f"Direct extraction failed for {pdf_path}: {e}")
+        text = ""
+    
+    # Step 2: Fall back to OCR if direct extraction failed or returned poor results
+    if use_ocr_fallback and OCR_AVAILABLE:
+        print(f"Attempting OCR extraction for {pdf_path}...")
+        ocr_text, ocr_error = extract_text_with_ocr(pdf_path)
+        
+        if ocr_text and is_text_extraction_successful(ocr_text):
+            return ocr_text, "ocr"
+        elif ocr_error:
+            print(f"OCR extraction failed for {pdf_path}: {ocr_error}")
+    
+    # Step 3: Return whatever we got (might be partial)
+    if text and len(text.strip()) > 0:
+        return text, "direct (partial)"
+    
+    return None, None
 
 def process_pdfs_in_directory(directory_path):
-    """Processes all PDFs in a directory, extracts text, and splits into documents."""
+    """
+    Processes all PDFs in a directory, extracts text, and splits into documents.
+    
+    Enhanced with Bengali OCR support:
+    - First attempts direct text extraction
+    - Falls back to OCR for scanned documents or Bengali text
+    - Tracks extraction method in document metadata
+    """
     all_docs = []
+    extraction_stats = {"direct": 0, "ocr": 0, "failed": 0}
+    
     if not os.path.exists(directory_path):
         st.warning(f"Directory not found: {directory_path}")
         return []
@@ -74,6 +204,14 @@ def process_pdfs_in_directory(directory_path):
 
     # Check if running in Streamlit context before using st elements
     streamlit_running = 'streamlit' in sys.modules
+    
+    # Check OCR availability
+    if streamlit_running and OCR_AVAILABLE:
+        ocr_ready, ocr_message = check_tesseract_installation()
+        if ocr_ready:
+            st.info(f"🌐 Bengali OCR Support: {ocr_message}")
+        else:
+            st.warning(f"⚠️ OCR Limited: {ocr_message}")
 
     if streamlit_running:
         progress_bar = st.progress(0, text="Processing PDFs...")
@@ -85,25 +223,47 @@ def process_pdfs_in_directory(directory_path):
 
     for i, filename in enumerate(pdf_files):
         pdf_path = os.path.join(directory_path, filename)
-        pdf_text = extract_text_from_pdf(pdf_path)
+        
+        # Use enhanced extraction with OCR fallback
+        pdf_text, extraction_method = extract_text_from_pdf(pdf_path, use_ocr_fallback=True)
+        
         if pdf_text:
+            # Track extraction method in metadata for transparency
+            metadata = {
+                "source": filename,
+                "extraction_method": extraction_method or "unknown"
+            }
+            
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=300)
-            docs = text_splitter.create_documents([pdf_text], metadatas=[{"source": filename}])
+            docs = text_splitter.create_documents([pdf_text], metadatas=[metadata])
             all_docs.extend(docs)
+            
+            # Update stats
+            if extraction_method and "ocr" in extraction_method.lower():
+                extraction_stats["ocr"] += 1
+            else:
+                extraction_stats["direct"] += 1
+        else:
+            extraction_stats["failed"] += 1
+            if streamlit_running:
+                st.warning(f"Could not extract text from: {filename}")
 
         if streamlit_running:
-            progress_bar.progress((i + 1) / total_files, text=f"Processing: {filename} ({i+1}/{total_files})")
+            method_indicator = f" [{extraction_method}]" if extraction_method else ""
+            progress_bar.progress((i + 1) / total_files, text=f"Processing: {filename}{method_indicator} ({i+1}/{total_files})")
         else:
-            print(f"Processed: {filename} ({i+1}/{total_files})")
+            print(f"Processed: {filename} [{extraction_method}] ({i+1}/{total_files})")
 
     if streamlit_running:
         progress_bar.empty()
         if not all_docs:
             st.warning("No text could be extracted from the PDFs.")
         else:
-            st.info(f"Processed {total_files} PDF files, extracted {len(all_docs)} document chunks.")
+            st.info(f"✅ Processed {total_files} PDF files, extracted {len(all_docs)} document chunks.")
+            st.info(f"📊 Extraction methods - Direct: {extraction_stats['direct']}, OCR: {extraction_stats['ocr']}, Failed: {extraction_stats['failed']}")
     else:
         print(f"Processed {total_files} PDF files, extracted {len(all_docs)} document chunks.")
+        print(f"Extraction stats - Direct: {extraction_stats['direct']}, OCR: {extraction_stats['ocr']}, Failed: {extraction_stats['failed']}")
         if not all_docs:
             print("Warning: No text could be extracted from the PDFs.")
 
