@@ -4,6 +4,7 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)
 ![LangChain](https://img.shields.io/badge/LangChain-0.1+-green.svg)
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o--mini-orange.svg)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, featuring conversational clarification and intelligent document retrieval._
@@ -24,7 +25,7 @@ _A sophisticated AI-powered legal assistant specializing in Bangladeshi law, fea
 - [📁 Project Structure](#-project-structure)
 - [🛠️ Installation](#️-installation)
 - [🚀 Quick Start](#-quick-start)
-- [📚 Legal Database](#-legal-database)
+- [�📚 Legal Database](#-legal-database)
 - [🤖 How It Works](#-how-it-works)
 - [🔧 Configuration](#-configuration)
 - [📊 Performance & Limitations](#-performance--limitations)
@@ -65,7 +66,7 @@ The chatbot serves as an educational tool and preliminary research assistant for
 - **Web Search Integration**: Tavily-powered web search for comprehensive coverage
 - **Multi-Source Synthesis**: Combines local documents with web results
 
-### � Bengali Language Support
+### Bengali Language Support
 
 - **OCR Processing**: Tesseract-based OCR for scanned Bengali documents
 - **Dual Language Support**: Handles both Bengali (বাংলা) and English text
